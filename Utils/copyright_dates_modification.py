@@ -41,9 +41,12 @@ class CopyrightDatesModification:
         '''Constructor.
         
         Args:
-            base_directory: the path to the base directory from which the
-                version,  revision  and  date of last modification of the
-                software will be evaluated down to the directories tree.
+            base_directory: str
+                The path to the base directory from which the version, 
+                revision and date of last modification of the software 
+                will be evaluated down to the directories tree.
+            excluded_directories: list
+                A list of excluded directories. Defaults to empty.
         '''
         self.base_directory       = base_directory
         self.excluded_directories = excluded_directories + ['__pycache__']

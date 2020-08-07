@@ -2,6 +2,8 @@
 """
 Copyright (c) 2020 Philippe Schmouker
 
+Project: 
+
 Permission is hereby granted,  free of charge,  to any person obtaining a copy
 of this software and associated documentation files (the "Software"),  to deal
 in the Software without restriction, including  without  limitation the rights
@@ -30,7 +32,8 @@ if __name__ == '__main__':
     This script automates the modification and the  extension  of
     copyright dates in the whole project PythonOpenSourceProject.
     """
+    #-------------------------------------------------------------------------
     CopyrightDatesModification( '../..',
                                 ['picts', 'data'] ).modify( verbose=True )
 
-#=====   end of   Utils.Scripts.copyright_dates_modification   =====#
+#=====   end of   Utils.Scripts.script_copyright_dates_modification   =====#
