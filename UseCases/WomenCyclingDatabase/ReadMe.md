@@ -22,4 +22,4 @@ Finally, in this third step querying this database will be implemented. The aim 
 
 
 ## Next
-It might be that next developments could be done using a no-sql database management system. This ccould be MongoDB for instance.
+It might be that next developments could be done using a no-sql database management system. This could be MongoDB for instance.
