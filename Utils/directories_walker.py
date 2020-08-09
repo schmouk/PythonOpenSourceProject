@@ -22,7 +22,7 @@ SOFTWARE.
 """
 
 #=============================================================================
-import os.listdir, os.path, os.remove, os.replace
+from os import listdir as os_listdir, path as os_path
 
 from Utils.decorators import abstract
 
@@ -90,42 +90,35 @@ class DirectoriesWalker:
 
     #-------------------------------------------------------------------------
     @abstract
-    def process(self, filepath: str) -> None:
+    def process(self, filepath: str) -> str:
         '''The files processing step.
         
-        Implement here the processing of files.  Do not  forget
-        to return True if processing was ok or False otherwise.
+        Implement here the processing of  files.  Mind  the  returned
+        message, which might be of interest for your application.
         
         This method must be implemented in inheriting classes.
         
         Args:
             filepath: str
                 The path to the file to process.
-        
+
         Returns:
-            True if processing was ok, or False otherwise.
+            A message to be printed as the result of the  processing.
+            This message will be printed only in verbose mode.
             
         Raises:
-            NotImplementedError: This method is not implemented
+            NotImplementedError: This method has not been implemented 
                 in the inheriting class.
         '''
-        ...
+        return False
 
 
     #-------------------------------------------------------------------------
-    def run(self, dir_path : str ,
-                   count    : int ,
-                   verbose  : bool,
-                   max_chars: int  ) -> None:
+    def run(self, verbose  : bool,
+                  max_chars: int = 54 ) -> None:
         '''Recursively runs through directories to process them.
         
         Args:
-            dir_path: str
-                The path to the directory to be parsed.
-            count: int
-                The  stop number.  Once number of found copyright texts is
-                equal to this stop-number,  file modification stops.  Runs
-                through the whole content of files if count = -1.
             verbose: bool
                 Set this to True to get prints on console while the script
                 runs  through  directories.  Set  it  to  False to not get 
@@ -134,11 +127,11 @@ class DirectoriesWalker:
                 The maximum number of chars in  file paths  that  will  be 
                 printed  on  verbose  mode.   Ellipsis  are  automatically
                 inserted in paths when length of  file path  exceeds  this
-                limit.
+                limit. Defaults to 54, which is a random value...
         '''
         self.initialize()
         
-        self._walk( dir_path, count, verbose, max_chars )
+        self._walk( self.base_directory, verbose, max_chars )
         
         self.finalize()
 
@@ -164,18 +157,13 @@ class DirectoriesWalker:
 
     #-------------------------------------------------------------------------
     def _walk(self, dir_path : str ,
-                   count    : int ,
-                   verbose  : bool,
-                   max_chars: int  ) -> None:
+                    verbose  : bool,
+                    max_chars: int  ) -> None:
         '''Recursively runs through directories to modify dates of copyright.
         
         Args:
             dir_path: str
                 The path to the directory to be parsed.
-            count: int
-                The  stop number.  Once number of found copyright texts is
-                equal to this stop-number,  file modification stops.  Runs
-                through the whole content of files if count = -1.
             verbose: bool
                 Set this to True to get prints on console while the script
                 runs  through  directories.  Set  it  to  False to not get 
@@ -187,13 +175,9 @@ class DirectoriesWalker:
                 limit.
         '''
         the_format = f"{max_chars:d}s" 
-
-        #-----------------------------------------------------------------
-        def _get_substring(match) -> str:
-            return match.string[ match.start():match.end() ]
         
         #-----------------------------------------------------------------
-        def _print_verbose(filename: str) -> None:
+        def _print_filepath(filename: str) -> None:
             if len(filename) <= max_chars:
                 filename = filename
             else:
@@ -204,35 +188,34 @@ class DirectoriesWalker:
         #-----------------------------------------------------------------
         
         # evaluates the content of current directory
-        my_dir_content = [ os.path.join(dir_path, filename) for filename in os.listdir(dir_path) ]
+        my_dir_content = [ os_path.join(dir_path, filename) for filename in os_listdir(dir_path) ]
         
         # extracts the contained sub-directories
         my_subdirs = [ dirpath  for dirpath  in my_dir_content \
-                        if os.listdir.isdir(dirpath) and os.listdir.basename(dirpath) not in self.excluded_directories ]
+                        if os_path.isdir(dirpath) and os_path.basename(dirpath) not in self.excluded_directories ]
         
         # and extracts the contained files
-        my_python_srcs = [ filepath for filepath in my_dir_content \
-                            if (filepath.endswith('.py') or filepath.endswith('.pyw')) and os.listdir.isfile(filepath) ]
+        my_python_srcs = [ filepath for filepath in my_dir_content if os_path.isfile(filepath) ]
         
         # recursively runs down (left deep first) into the directories tree
         for subdir_path in my_subdirs:
-            self._walk( subdir_path, count, verbose, max_chars )
+            self._walk( subdir_path, verbose, max_chars )
         
         # and finally runs through the whole files that are contained in current directory 
         for file_path in my_python_srcs:
             
             if verbose:
-                _print_verbose( file_path )
+                _print_filepath( file_path )
             
             if self.select( file_path ):
-                ok = self.process( file_path )
+                msg = self.process( file_path )
                 
                 if verbose:
-                    print( ' ok' if ok else ' not-ok' )
+                    print( msg )
             
             else:
                 if verbose:
-                    print( ' not processed' )
+                    print( 'not processed' )
 
 
 #=====   end of   Utils.directories_walker   =====#
