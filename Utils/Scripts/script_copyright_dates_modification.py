@@ -34,6 +34,6 @@ if __name__ == '__main__':
     """
     #-------------------------------------------------------------------------
     CopyrightDatesModification( '../..',
-                                ['picts', 'data'] ).modify( verbose=True )
+                                ['picts', 'data', '.settings', '.git'] ).run( verbose=True )
 
 #=====   end of   Utils.Scripts.script_copyright_dates_modification   =====#

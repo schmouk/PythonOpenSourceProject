@@ -95,10 +95,7 @@ class FirstAnalytics:
     def print_stats(self) -> None:
         '''Finally prints statistics on keywords.
         '''
-        #=======================================================================
-        # final_counts = [ self._KwCountEntry(k,v) for k,v in sorted(self.kw_counts.items()) ]
-        # final_counts.sort( reverse=True )
-        #=======================================================================
+        # sorts keywords according to their frequency
         final_counts = self._get_sorted_counts( self.kw_counts )
         
         max_kw_length = max( [ len(kw.kw) for kw in final_counts ] )
@@ -119,11 +116,6 @@ class FirstAnalytics:
             print( f"\n{rank+1:3d}. {key_count.kw:{kw_format}} - {key_count.count:4d}" )
             
             #-- Then, prints its ranked associations
-            #===================================================================
-            # kw_assoc = self.kw_associations[ key_count.kw ]
-            # assoc_counts = [ self._KwCountEntry(k,v) for k,v in sorted(kw_assoc.items()) ]
-            # assoc_counts.sort( reverse=True )
-            #===================================================================
             assoc_counts = self._get_sorted_counts( self.kw_associations[key_count.kw] )
             
             for kc in assoc_counts:
