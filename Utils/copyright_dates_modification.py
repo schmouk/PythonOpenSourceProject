@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Copyright (c) 2020 Philippe Schmouker
 
@@ -23,15 +22,17 @@ SOFTWARE.
 
 #=============================================================================
 from datetime import  date
-from os       import (listdir as os_listdir,
-                      path    as os_path   ,
-                      remove  as os_remove ,
+from os       import (remove  as os_remove ,
                       replace as os_replace )
-import re 
+from pathlib  import  Path
+
+import re
+
+from .directories_walker import DirectoriesWalker
 
 
 #=============================================================================
-class CopyrightDatesModification:
+class CopyrightDatesModification( DirectoriesWalker ):
     """Helps the automation for modifying the dates of copyrights.
     """
     
@@ -48,115 +49,46 @@ class CopyrightDatesModification:
             excluded_directories: list
                 A list of excluded directories. Defaults to empty.
         '''
-        self.base_directory       = base_directory
-        self.excluded_directories = excluded_directories + ['__pycache__']
-        self.reset() 
+        super().__init__( base_directory, excluded_directories + ['__pycache__'] )
 
     #-------------------------------------------------------------------------
-    def modify(self, count    : int  = -1   ,
-                     verbose  : bool = False,
-                     max_chars: int  = 54    ) -> None:
-        '''Runs the script of modifying files content.
-        
-        Args:
-            count: the stop number.  Once number of found copyright texts
-                is  equal  to this stop-number,  file modification stops.
-                Set this to -1 to run through the whole content of files.
-                Defaults to -1.
-            verbose: bool
-                Set this to True to  get  prints  on  console  while  the
-                script  runs through directories.  Set it to False to not
-                get prints. Defaults to False (i.e. silent mode).
-            max_chars: int
-                The maximum number of chars in  file paths  that  will  be 
-                printed  on  verbose  mode.   Ellipsis  are  automatically
-                inserted in paths when length of  file path  exceeds  this
-                limit. Defaults to 54, which has been chosen at random ;-)
-        '''
-        if not self.already_evaluated:
-            self._run_directory( self.base_directory, count, verbose, max_chars )
-    
-    #-------------------------------------------------------------------------
-    def reset(self) -> None:
+    def initialize(self) -> None:
         '''Prepares the modification of copyright dates.
         '''
-        self.already_evaluated = False
         self.current_year = str( date.today().year )
         self.reg_exp = re.compile( '(1|2)[0-9]{3}' )
 
     #-------------------------------------------------------------------------
-    def _run_directory(self, dir_path : str ,
-                             count    : int ,
-                             verbose  : bool,
-                             max_chars: int  ) -> None:
-        '''Recursively runs through directories to modify dates of copyright.
+    def process(self, filepath: str) -> str:
+        '''The files processing step.
         
         Args:
-            dir_path: str
-                The path to the directory to be parsed.
-            count: int
-                The  stop number.  Once number of found copyright texts is
-                equal to this stop-number,  file modification stops.  Runs
-                through the whole content of files if count = -1.
-            verbose: bool
-                Set this to True to get prints on console while the script
-                runs  through  directories.  Set  it  to  False to not get 
-                prints. Defaults to False (i.e. silent mode).
-            max_chars: int
-                The maximum number of chars in  file paths  that  will  be 
-                printed  on  verbose  mode.   Ellipsis  are  automatically
-                inserted in paths when length of  file path  exceeds  this
-                limit.
-        '''
-        the_format = f"{max_chars:d}s" 
+            filepath: str
+                The path to the file to process.
 
+        Returns:
+            A message to be printed as the result of the processing.
+            This message will be printed only in verbose mode.
+        '''
         #-----------------------------------------------------------------
         def _get_substring(match) -> str:
             return match.string[ match.start():match.end() ]
-        
-        #-----------------------------------------------------------------
-        def _print_verbose(src_filename: str) -> None:
-            if len(src_filename) <= max_chars:
-                file_name = src_filename
-            else:
-                file_name = '...' + src_filename[3-max_chars:]
-
-            print( f"{file_name:{the_format}}", end='  ', flush=True )
-        
         #-----------------------------------------------------------------
         
-        # evaluates the content of current directory
-        my_dir_content = [ os_path.join(dir_path, filename) for filename in os_listdir(dir_path) ]
+        ret_msg = ''
         
-        # extracts the contained sub-directories
-        my_subdirs     = [ dirpath  for dirpath  in my_dir_content \
-                            if os_path.isdir(dirpath) and os_path.basename(dirpath) not in self.excluded_directories ]
-        
-        # and extracts the contained files
-        my_python_srcs = [ filepath for filepath in my_dir_content \
-                            if (filepath.endswith('.py') or filepath.endswith('.pyw')) and os_path.isfile(filepath) ]
-        
-        # recursively runs down (left deep first) into the directories tree
-        for subdir_path in my_subdirs:
-            self._run_directory( subdir_path, count, verbose, max_chars )
-        
-        # and finally runs through the whole files that are contained in current directory 
-        for python_src_path in my_python_srcs:
-            
-            if verbose:
-                _print_verbose( python_src_path )
-            
-            b_modified = False
-            
+        try:
             # opens current file
-            with open( python_src_path, 'r' ) as fp:
+            with open( filepath, 'r' ) as fp:
+                
+                b_modified = False
                 
                 # reads the whole lines
                 file_content = fp.readlines()
                 
                 # runs through each line
                 for num_line, line in enumerate(file_content):
-                    if 'Copyright ' in line:
+                    if 'Copyright ' in line or 'copyright' in line:
                         # ok, copyright has been found
                         dates_match = [ d for d in self.reg_exp.finditer( line ) ]
                         
@@ -170,7 +102,7 @@ class CopyrightDatesModification:
                                     file_content[ num_line ] = f"{line[:my_end_index]}-{self.current_year}{line[my_end_index:]}"
                                     b_modified = True
                             except:
-                                count += 1
+                                pass
                         
                         else:
                             try:
@@ -183,35 +115,53 @@ class CopyrightDatesModification:
                                     file_content[ num_line ] = f"{line[:my_start_index]}{self.current_year}{line[my_end_index:]}"
                                     b_modified = True
                             except:
-                                count += 1
-
-                        count -= 1
-                        if count == 0:
-                            # ok, let's stop modifying copyright dates in this file
-                            break
+                                pass
                         
             if b_modified:
                 # some copyright dates have been modified,
                 # so we have to modify file
                 try:
-                    if verbose:
-                        print( 'modified' )
+                    ret_msg = '--> modified <--'
+                        
                     # save modified file
-                    new_name = python_src_path+'~'
+                    new_name = filepath + '~'
                     with open( new_name, 'w' ) as fp:
                         fp.writelines( file_content )
                         
                     # remove former one and rename new one
-                    os_remove( python_src_path )
-                    os_replace( new_name, python_src_path )
+                    os_remove( filepath )
+                    os_replace( new_name, filepath )
                     
                 except Exception as e:
-                    print( f"!!! Exception raised while modifying file'{python_src_path:s}\n  -- {str(e):s}" )
+                    ret_msg = f"!!! Exception raised while modifying file '{filepath:s}\n  -- {str(e):s}"
             else:
-                if verbose:
-                    print( 'ok' )
+                ret_msg = 'already ok'
+        
+        except Exception as e:
+            ret_msg = f"!!! Exception raised while accessing file\n  -- {str(e):s}"
+        
+        finally:
+            return ret_msg
 
-
-        self.already_evaluated = True
+    #-------------------------------------------------------------------------
+    def select(self, filepath: str) -> bool:
+        '''Indicates the files that must be processed.
+        
+        Args:
+            filepath: str
+                The path to the file to process.
+        
+        Returns:
+            True it the specified file must be processed, or 
+            False otherwise.
+        '''
+        try:
+            suffix = Path( filepath ).suffix.lower()
+            return suffix in [ '.py', '.pyw', 
+                               '.htm', '.html', '.js', '.css',
+                               '.txt', '.md',
+                               '.cpp', '.php', '.java', '.go' ]
+        except:
+            return False
 
 #=====   end of   Utils.copyright_dates_modification   =====#

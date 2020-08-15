@@ -2,8 +2,6 @@
 """
 Copyright (c) 2020 Philippe Schmouker
 
-Project: 
-
 Permission is hereby granted,  free of charge,  to any person obtaining a copy
 of this software and associated documentation files (the "Software"),  to deal
 in the Software without restriction, including  without  limitation the rights
@@ -34,6 +32,6 @@ if __name__ == '__main__':
     """
     #-------------------------------------------------------------------------
     CopyrightDatesModification( '../..',
-                                ['picts', 'data'] ).modify( verbose=True )
+                                ['picts', 'data', '.settings', '.git'] ).run( verbose=True )
 
 #=====   end of   Utils.Scripts.script_copyright_dates_modification   =====#
