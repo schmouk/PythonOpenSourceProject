@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Copyright (c) 2020 Philippe Schmouker
 
@@ -24,8 +23,11 @@ SOFTWARE.
 #=============================================================================
 import csv
 from pathlib  import Path
-import pylightxl
 
+try:
+    import pandas as pd
+except:
+    pass
 
 from Utils.directories_walker import DirectoriesWalker
 
@@ -37,9 +39,9 @@ class XslxToCsvTranslator( DirectoriesWalker ):
     Note: see https://pylightxl.readthedocs.io/en/latest/sourcecode/index.html
     """   
     #-------------------------------------------------------------------------
-    def __init__(self, basedir_path: str,
+    def __init__(self, basedir_path        : str      ,
                        excluded_directories: list = [],
-                       csv_separator: str = ',') -> None:
+                       csv_separator       : str = ',' ) -> None:
         '''Constructor.
         
         Args:
@@ -75,27 +77,33 @@ class XslxToCsvTranslator( DirectoriesWalker ):
         
         try:
             # reads the XLS file
-            excel_file = pylightxl.readxl( filepath )
+            excel_file = pd.ExcelFile( filepath )
 
-            # gets the work sheets names
-            work_sheets_names = excel_file.ws_names()
+            #===================================================================
+            # # gets the work sheets names
+            # work_sheets_names = excel_file.sheet_names
+            #===================================================================
             
             # gets the first work sheet (contains the data to prepare)
-            work_sheet = work_sheets_names[ 0 ]
+            work_sheet = excel_file.parse()
+            ##work_sheet = excel_file.parse( work_sheets_names[ 0 ] )
 
             # prepares and opens the related CSV file
             try:
                 csv_filepath = Path( filepath ).with_suffix( '.csv' )
-                with open( csv_filepath, 'w', newline='', encoding='utf-8' ) as csv_file:
-                    
-                    # prepares the CSV writer
-                    csv_writer = csv.writer( csv_file, self._UCI_CSV_DIALECT )
-                     
-                    # then iterates over all of the Excel work sheet rows
-                    csv_writer.writerows( work_sheet.rows() )
-                    
-                    # once here, everything was fine
-                    ret_msg = "ok"
+                work_sheet.to_csv( csv_filepath )
+                #===============================================================
+                # with open( csv_filepath, 'w', newline='', encoding='utf-8' ) as csv_file:
+                #     
+                #     # prepares the CSV writer
+                #     csv_writer = csv.writer( csv_file, self._UCI_CSV_DIALECT )
+                #      
+                #     # then iterates over all of the Excel work sheet rows
+                #     csv_writer.writerows( work_sheet )
+                #     
+                #     # once here, everything was fine
+                #===============================================================
+                ret_msg = "ok"
                 
             except Exception as e:
                 # exception raised while creating the CSV file

@@ -22,16 +22,15 @@ SOFTWARE.
 """
 
 #=============================================================================
-from Utils.copyright_dates_modification import CopyrightDatesModification
+from UseCases.WomenCyclingDatabase.DataPreparation.xlsx_to_csv_translator import XslxToCsvTranslator 
+
 
 #=============================================================================
 if __name__ == '__main__':
-    """
-    This script automates the modification and the  extension  of
-    copyright dates in the whole project PythonOpenSourceProject.
+    """This script description.
     """
     #-------------------------------------------------------------------------
-    CopyrightDatesModification( '../..',
-                                ['picts', 'data', '.settings', '.git'] ).run( verbose=True )
+    XslxToCsvTranslator( '../data' ).run( True, 104 )
 
-#=====   end of   Utils.Scripts.script_copyright_dates_modification   =====#
+
+#=====   end of   UseCases.WomenCyclingDatabase.Scripts.script_prepare_csv_files   =====#

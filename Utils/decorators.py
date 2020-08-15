@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Copyright (c) 2020 Philippe Schmouker
 
@@ -27,13 +26,11 @@ SOFTWARE.
 #   - abstract
 #
 
-
 #=============================================================================
 from typing import Callable
 
 
 #=============================================================================
-
 #-------------------------------------------------------------------------
 def abstract(method: Callable) -> Callable:
     '''Raises exception NotImplementedfError.
@@ -80,7 +77,6 @@ def abstract(method: Callable) -> Callable:
         
         raise NotImplementedError( f"{_msg_txt()} in class '{class_name}'." )
     #---------------------------------------------------------------------
-
     return _wrapper
 
 #=====   end of   Utils.decorators   =====#
