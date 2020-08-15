@@ -23,11 +23,8 @@ SOFTWARE.
 #=============================================================================
 import csv
 from pathlib  import Path
+import pandas as pd
 
-try:
-    import pandas as pd
-except:
-    pass
 
 from Utils.directories_walker import DirectoriesWalker
 
