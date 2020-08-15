@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 """
-Copyright (c) 2019-2020 Philippe Schmouker
+Copyright (c) 2020 Philippe Schmouker
 
 Permission is hereby granted,  free of charge,  to any person obtaining a copy
 of this software and associated documentation files (the "Software"),  to deal
@@ -60,7 +59,7 @@ class CopyrightDatesModification( DirectoriesWalker ):
         self.reg_exp = re.compile( '(1|2)[0-9]{3}' )
 
     #-------------------------------------------------------------------------
-    def process(self, filepath: str) -> bool:
+    def process(self, filepath: str) -> str:
         '''The files processing step.
         
         Args:
@@ -68,7 +67,8 @@ class CopyrightDatesModification( DirectoriesWalker ):
                 The path to the file to process.
 
         Returns:
-            True if a message has been printed as the resu, or False otherwise.
+            A message to be printed as the result of the processing.
+            This message will be printed only in verbose mode.
         '''
         #-----------------------------------------------------------------
         def _get_substring(match) -> str:
@@ -153,8 +153,7 @@ class CopyrightDatesModification( DirectoriesWalker ):
         
         Returns:
             True it the specified file must be processed, or 
-            False  otherwise.  In this base class, ALL files 
-            are said to be processed.
+            False otherwise.
         '''
         try:
             suffix = Path( filepath ).suffix.lower()

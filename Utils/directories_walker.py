@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Copyright (c) 2020 Philippe Schmouker
 
@@ -63,7 +62,6 @@ class DirectoriesWalker:
         self.base_directory       = base_directory
         self.excluded_directories = excluded_directories + ['__pycache__']
 
-
     #-------------------------------------------------------------------------
     def finalize(self) -> None:
         '''Finalization of the walking through directories.
@@ -75,7 +73,6 @@ class DirectoriesWalker:
         '''
         pass
 
-
     #-------------------------------------------------------------------------
     def initialize(self) -> None:
         '''Initialization of the walking through directories.
@@ -86,7 +83,6 @@ class DirectoriesWalker:
         In this base class, nothing is done.
         '''
         pass
-
 
     #-------------------------------------------------------------------------
     @abstract
@@ -112,7 +108,6 @@ class DirectoriesWalker:
         '''
         return False
 
-
     #-------------------------------------------------------------------------
     def run(self, verbose  : bool,
                   max_chars: int = 54 ) -> None:
@@ -135,7 +130,6 @@ class DirectoriesWalker:
         
         self.finalize()
 
-
     #-------------------------------------------------------------------------
     def select(self, filepath: str) -> bool:
         '''Indicates the files that must be processed.
@@ -153,7 +147,6 @@ class DirectoriesWalker:
             are said to be processed.
         '''
         return True
-
 
     #-------------------------------------------------------------------------
     def _walk(self, dir_path : str ,
@@ -216,6 +209,5 @@ class DirectoriesWalker:
             else:
                 if verbose:
                     print( 'not processed' )
-
 
 #=====   end of   Utils.directories_walker   =====#
