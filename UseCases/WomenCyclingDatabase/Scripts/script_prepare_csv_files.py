@@ -31,6 +31,8 @@ if __name__ == '__main__':
     """
     #-------------------------------------------------------------------------
     XslxToCsvTranslator( '../data' ).run( True, 104 )
+    
+    print( "\n-- done! ")
 
 
 #=====   end of   UseCases.WomenCyclingDatabase.Scripts.script_prepare_csv_files   =====#
