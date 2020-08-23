@@ -156,5 +156,5 @@ See [www.postgresql.org/docs/12/datatype.html](https://www.postgresql.org/docs/1
 
 ## History
 
-0.1 - draft - Schmouk - 2020-08-16 - Creation.
+0.1 - draft - Schmouk - 2020-08-16 - Creation.  
 0.2 - draft - Schmouk - 2020-08-22 - Largely augmented section 3 - SQL tables structures.
