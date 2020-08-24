@@ -122,4 +122,4 @@ def TimestampFromTicks(self, ticks: float) -> datetime.datetime:
     return datetime.datetime.fromtimestamp( ticks )
 
 
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.db_types   =====#
+#=====   end of   Libs.ObjectSqlLib.db_types   =====#

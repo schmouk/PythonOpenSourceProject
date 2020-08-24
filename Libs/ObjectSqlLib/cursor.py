@@ -481,16 +481,7 @@ class Cursor:
         '.next()'.
         '''
         warning( "DB-API extension cursor.__iter__() used" )
-        
 
-    #-------------------------------------------------------------------------
-    def lastrowid
-
-    This read-only attribute provides the rowid of the last modified row (most databases return a rowid only when a single INSERT operation is performed). If the operation does not set a rowid or if the database does not support rowids, this attribute should be set to None.
-
-    The semantics of .lastrowid are undefined in case the last executed statement modified more than one row, e.g. when using INSERT with .executemany().
-
-    Warning Message: "DB-API extension cursor.lastrowid used"
 
     #-------------------------------------------------------------------------
     @abstract
@@ -658,4 +649,4 @@ class Cursor:
     # Class data
     NO_ROW_COUNT = -1  # Future versions of the DB API specification (i.e. PEP 249) could redefine None instead of -1.
     
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.cursor   =====#
+#=====   end of   Libs.ObjectSqlLib.cursor   =====#

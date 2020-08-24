@@ -110,4 +110,4 @@ class NotSupportedError( DatabaseError ):
     pass
 
 
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.exceptions   =====#
+#=====   end of   Libs.ObjectSqlLib.exceptions   =====#

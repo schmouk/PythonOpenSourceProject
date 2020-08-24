@@ -217,4 +217,4 @@ class TPCConnection( Connection ):
         return (format_id, global_transaction_id, branch_qualifier )
 
 
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.tpc_connection   =====#
+#=====   end of   Libs.ObjectSqlLib.tpc_connection   =====#

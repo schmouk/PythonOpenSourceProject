@@ -239,4 +239,4 @@ class Connection:
         warning( "DB-API extension Connection.NotSupportedError used" )
 
 
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.connection   =====#
+#=====   end of   Libs.ObjectSqlLib.connection   =====#
