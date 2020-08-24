@@ -41,7 +41,7 @@ In the CSV files:
 - we do not store `Calendar`, `EMail` and `WebSite` data - no use for them here.
 
 	CREATE TABLE calendar_rr_we (
-	    id          SERIAL        PRIMARY KEY,
+	    id          serial        PRIMARY KEY,
 	    year        integer       NOT NULL,
 	    name        varchar(126)  NOT NULL,
 	    day         date          NOT NULL,
@@ -116,7 +116,7 @@ The CSV headr of data is:
 We do not store format, e-mail and website data - no use for this use case.
 
     CREATE TABLE teams_we {
-        id          SERIAL       PRIMARY KEY,
+        id          serial       PRIMARY KEY,
         code        char(4)      NOT NULL,
         name        varchar(58)  NOT NULL,
         categ       char(4)      NOT NULL REFERENCES teams_categories(categ),
@@ -133,7 +133,7 @@ We do not store format, e-mail and website data - no use for this use case.
 Up today, stored information is extracted from results, not from teams compositions (which are harder to collect on the UCI web site).
 
     CREATE TABLE cyclists_we {
-        id      SERIAL   PRIMARY KEY,
+        id      serial   PRIMARY KEY,
         f_name  varchar  NOT NULL,  -- caution: not limited varchar is a PostgreSQL extension
         l_name  varchar  NOT NULL,  -- caution: not limited varchar is a PostgreSQL extension
     }

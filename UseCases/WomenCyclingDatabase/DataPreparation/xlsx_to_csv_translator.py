@@ -75,11 +75,6 @@ class XslxToCsvTranslator( DirectoriesWalker ):
         try:
             # reads the XLS file
             excel_file = pd.ExcelFile( filepath )
-
-            #===================================================================
-            # # gets the work sheets names
-            # work_sheets_names = excel_file.sheet_names
-            #===================================================================
             
             # gets the first work sheet (contains the data to prepare)
             work_sheet = excel_file.parse()
@@ -89,17 +84,6 @@ class XslxToCsvTranslator( DirectoriesWalker ):
             try:
                 csv_filepath = Path( filepath ).with_suffix( '.csv' )
                 work_sheet.to_csv( csv_filepath )
-                #===============================================================
-                # with open( csv_filepath, 'w', newline='', encoding='utf-8' ) as csv_file:
-                #     
-                #     # prepares the CSV writer
-                #     csv_writer = csv.writer( csv_file, self._UCI_CSV_DIALECT )
-                #      
-                #     # then iterates over all of the Excel work sheet rows
-                #     csv_writer.writerows( work_sheet )
-                #     
-                #     # once here, everything was fine
-                #===============================================================
                 ret_msg = "ok"
                 
             except Exception as e:

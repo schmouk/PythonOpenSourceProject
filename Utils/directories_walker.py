@@ -86,7 +86,7 @@ class DirectoriesWalker:
 
     #-------------------------------------------------------------------------
     @abstract
-    def process(self, filepath: str) -> str:
+    def process(self, _filepath: str) -> str:
         '''The files processing step.
         
         Implement here the processing of  files.  Mind  the  returned
@@ -95,7 +95,7 @@ class DirectoriesWalker:
         This method must be implemented in inheriting classes.
         
         Args:
-            filepath: str
+            _filepath: str
                 The path to the file to process.
 
         Returns:
@@ -131,14 +131,14 @@ class DirectoriesWalker:
         self.finalize()
 
     #-------------------------------------------------------------------------
-    def select(self, filepath: str) -> bool:
+    def select(self, _filepath: str) -> bool:
         '''Indicates the files that must be processed.
         
         This method may be implemented in inheriting classes.
         It indicates the files which must be processed.
         
         Args:
-            filepath: str
+            _filepath: str
                 The path to the file to process.
         
         Returns:
