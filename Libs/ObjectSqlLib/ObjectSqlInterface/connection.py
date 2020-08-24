@@ -24,11 +24,11 @@ SOFTWARE.
 from typing import Optional
 
 from Utils.decorators import abstract
-from . import Cursor
+from .                import Cursor, warning
 
 
 #=============================================================================
-class Connect:
+class Connection:
     """Class of connection objects.
     
     This is an interface, i.e. an abstract class.
@@ -45,14 +45,17 @@ class Connect:
     """
     
     #-------------------------------------------------------------------------
-    def __init__(self, dsn     : str,
-                       user    : Optional[str] = None,
-                       password: Optional[str] = None,
-                       host    : Optional[str] = None,
-                       database: Optional[str] = None,) -> None:
+    @abstract
+    def __init__(self, _dsn     : str,
+                       _user    : Optional[str] = None,
+                       _password: Optional[str] = None,
+                       _host    : Optional[str] = None,
+                       _database: Optional[str] = None ) -> None:
         '''Constructor.
         
         Creates a new connection to the specified DB.
+        
+        MUST BE IMPLEMENTED in inheriting classes.
         
         Note from PEP 249:
         As a guideline the connection constructor parameters should 
@@ -64,13 +67,8 @@ class Connect:
             password     Password as string (optional)
             host         Hostname (optional)
             database     Database name (optional)
-        
-        Args:
-            dsn: str
-                The data source name of the database  to  which  to 
-                create this new connection, e.g. 'myhost:MYDB'
         '''
-        self.name = db_name
+        ...
     
     #-------------------------------------------------------------------------
     def __del__(self) -> None:
@@ -113,7 +111,7 @@ class Connect:
         implement this method with void functionality.
         '''
         ...
-    
+
     #-------------------------------------------------------------------------
     def cursor(self) -> Cursor:
         '''Return a new Cursor Object using the connection.
@@ -142,7 +140,7 @@ class Connect:
         the  changes  first  will  cause an implicit rollback to be 
         performed.
         
-        Note (PEP 2449): If  the  database  does  not  support  the 
+        Note (PEP 249):  If  the  database  does  not  support  the 
         functionality  required by the method, the interface should 
         throw an exception in case the method is used.
         The preferred approach is to not implement the  method  and 
@@ -156,6 +154,89 @@ class Connect:
         the roll back when the method is invoked.
         '''
         ...
-        
 
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.connect   =====#
+
+#=============================================================================
+## PEP 249: Optional DB API Extensions
+#
+#    Next exceptions definitions are part of the Connection
+#    class to conform with PEP 249 DB-API Extensions.  They
+#    are set as their originals are  in module exceptions.
+#
+
+    class Error( Exception ):
+        '''Exception that is the base class of all other error exceptions.
+        
+        You can use this to catch all errors with one single 
+        except statement. Warnings are not considered errors 
+        and thus should not use this class as base.
+        '''
+        warning( "DB-API extension Connection.Error used" )
+        
+        
+    class InterfaceError( Error ):
+        '''Exception raised for errors that are related to the database interface rather than the database itself.
+        '''
+        warning( "DB-API extension Connection.InterfaceError used" )
+    
+    
+    class DatabaseError( Error ):
+        '''Exception raised for errors that are related to the database.
+        '''
+        warning( "DB-API extension Connection.DatabaseError used" )
+    
+    
+    class DataError( DatabaseError ):
+        '''Exception raised for errors that are due to problems with the processed data.
+        
+         e.g. division by zero, numeric value out of range, etc.
+        '''
+        warning( "DB-API extension Connection.DataError used" )
+    
+    
+    class OperationalError( DatabaseError ):
+        '''Exception raised for errors that are related to the database's operation.
+        
+        These errors are not necessarily under the control of the programmer, e.g. 
+        an  unexpected  disconnect  occurs,  the data source name is not found,  a 
+        transaction could not be processed,  a memory  allocation  error  occurred 
+        during processing, etc.
+        '''
+        warning( "DB-API extension Connection.OperationalError used" )
+    
+    
+    class IntegrityError( DatabaseError ):
+        '''Exception raised when the relational integrity of the database is affected.
+        
+        e.g. a foreign key check fails.
+        '''
+        warning( "DB-API extension Connection.IntegrityError used" )
+    
+    
+    class InternalError( DatabaseError ):
+        '''Exception raised when the database encounters an internal error.
+        
+        e.g. the cursor is not valid anymore, the transaction is out of sync, etc.
+        '''
+        warning( "DB-API extension Connection.InternalError used" )
+    
+    
+    class ProgrammingError( DatabaseError ):
+        '''Exception raised for programming errors.
+        
+        e.g. table not found or already exists, syntax error in the SQL statement, 
+        wrong number of parameters specified, etc.
+        '''
+        warning( "DB-API extension Connection.ProgrammingError used" )
+    
+    
+    class NotSupportedError( DatabaseError ):
+        '''Exception raised in case a method or database API was used which is not supported by the database.
+        
+         e.g. requesting a .rollback() on a connection that does not support 
+         transaction or has transactions turned off. 
+        '''
+        warning( "DB-API extension Connection.NotSupportedError used" )
+
+
+#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.connection   =====#

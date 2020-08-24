@@ -24,11 +24,12 @@ SOFTWARE.
 from typing import ForwardRef, List, Optional, Tuple, Union
 
 from Utils.decorators import abstract
-from . import Type as DBType
+from . import ExtensionMessages, TYPE, warning
 
 
 #=============================================================================
 ConnectionRef = ForwardRef( "Connection" )
+CursorRef     = ForwardRef( "Cursor" )
 
 
 #=============================================================================
@@ -57,10 +58,13 @@ class Cursor:
                 part of PEP 249 and is provided as a convenience to
                 get easy access to initializing connections.
         '''
-        self.connection = parent_connection
-        self._reset_row_descr()
+        self._connection = parent_connection
         self._row_count = self.NO_ROW_COUNT
+        self._row_number = 0
+        self._last_row_id = None
         self._array_size = 1
+        self._messages = ExtensionMessages()
+        self._reset_row_descr()
 
     
     #-------------------------------------------------------------------------
@@ -103,7 +107,20 @@ class Cursor:
         
     #-------------------------------------------------------------------------
     @property
-    def description(self) -> Tuple[str, DBType, Optional[int], Optional[int], Optional[int], Optional[int], Optional[bool]]:
+    def connection(self) -> ConnectionRef:
+        '''Returns a reference to the Connection object on which the cursor was created.
+        
+        From PEP 249:
+        The attribute simplifies writing polymorph code  in  multi-
+        connection environments.
+        '''
+        warning( "DB-API extension Cursor.connection used" )
+        return self._connection
+        
+        
+    #-------------------------------------------------------------------------
+    @property
+    def description(self) -> Tuple[str, TYPE, Optional[int], Optional[int], Optional[int], Optional[int], Optional[bool]]:
         '''This read-only attribute is a sequence of 7-item sequences.
         
         From PEP 249:
@@ -135,6 +152,57 @@ class Cursor:
                 self.row_precision,
                 self.row_scale,
                 self.row_null_ok)
+
+
+    #-------------------------------------------------------------------------
+    @property
+    def lastrowid(self) -> int:
+        '''Provides the rowid of the last modified row.
+        
+        From PEP 249:
+        Most databases return a rowid only  when  a  single  INSERT 
+        operation  is  performed.  If  the operation does not set a 
+        rowid or if the database  does  not  support  rowids,  this 
+        attribute should be set to None.
+
+        The semantics of .lastrowid are undefined incase  the  last 
+        executed  statement modified more than one row,  e.g.  when 
+        using INSERT with '.executemany()'.
+        '''
+        warning( "DB-API extension cursor.lastrowid used" )
+        return self._last_row_id
+
+
+    #-------------------------------------------------------------------------
+    @property
+    def messages(self) -> ExtensionMessages:
+        '''The list of messages which the interfaces receives from the underlying database for this cursor.
+
+        You may call '._clear_messages() to empty  this  list.  You
+        may  call  '.add_message()' to append a new message to this
+        list. See copy of PEP 249 text below.
+        
+        From PEP 249:
+        This is a Python list object to which the interface appends 
+        tuples  (exception class, exception value) for all messages 
+        which the interfaces receives from the underlying  database 
+        for this cursor.
+    
+        The list is cleared by all standard  cursor  methods  calls 
+        (prior  to  executing  the  call)  except for the .fetch*() 
+        calls automatically to avoid excessive memory usage and can 
+        also be cleared by executing del cursor.messages[:].
+    
+        All error and warning messages generated  by  the  database 
+        are placed into this list,  so checking the list allows the 
+        user to verify correct operation of the method calls.
+    
+        The aim of this attribute is to eliminate the  need  for  a 
+        Warning   exception   which  often  causes  problems  (some 
+        warnings really only have informational character).
+        '''
+        warning( "DB-API extension Cursor.messages used" )
+        return self._messages
 
 
     #-------------------------------------------------------------------------
@@ -177,6 +245,24 @@ class Cursor:
         '''
         return self._row_count
 
+
+    #-------------------------------------------------------------------------
+    @property
+    def rownumber(self) -> int:
+        '''provide the current 0-based index of the cursor
+        
+        From PEP 249:
+        This read-only attribute should provide the current 0-based 
+        index  of the cursor in the result set or None if the index 
+        cannot be determined.
+    
+        The index can be seen as index of the cursor in a  sequence 
+        (the result  set).  The next fetch operation will fetch the 
+        row indexed by .rownumber in that sequence.
+        '''
+        warning( "DB-API extension Cursor.rownumber used" )
+        return self._row_number
+    
 
     #-------------------------------------------------------------------------
     @abstract
@@ -384,8 +470,45 @@ class Cursor:
         call was issued yet.
         '''
         ...
-    
 
+
+    #-------------------------------------------------------------------------
+    def __iter__(self) -> CursorRef:
+        '''Returns self to make cursors compatible to the iteration protocol.
+        
+        This is part 1/2 of the implementation of  a  generator  as
+        specifie d in PEP 249 DB-API Extension.  See pending method
+        '.next()'.
+        '''
+        warning( "DB-API extension cursor.__iter__() used" )
+        
+
+    #-------------------------------------------------------------------------
+    def lastrowid
+
+    This read-only attribute provides the rowid of the last modified row (most databases return a rowid only when a single INSERT operation is performed). If the operation does not set a rowid or if the database does not support rowids, this attribute should be set to None.
+
+    The semantics of .lastrowid are undefined in case the last executed statement modified more than one row, e.g. when using INSERT with .executemany().
+
+    Warning Message: "DB-API extension cursor.lastrowid used"
+
+    #-------------------------------------------------------------------------
+    @abstract
+    def next(self) -> Tuple:
+        '''Returns the next row from the currently executing SQL statement.
+        
+        This is part 2/2 of the implementation of  a  generator  as
+        specifie d in PEP 249 DB-API Extension.  See pending method
+        '.__iter__()'.
+        
+        From PEP-249:
+        Uses the same semantics as '.fetchone()' for  the  returned 
+        value.  A StopIteration exception is raised when the result 
+        set is exhausted.
+        '''
+        warning( "DB-API extension cursor.next() used" )
+
+    
     #-------------------------------------------------------------------------
     @abstract
     def nextset(self) -> Optional[bool]:
@@ -425,7 +548,31 @@ class Cursor:
 
     #-------------------------------------------------------------------------
     @abstract
-    def setinputsizes(self, sizes: Tuple[Union[int,DBType]]) -> None:
+    def scroll(self, value: int, mode: Optional[str] = 'relative') -> None:
+        '''Scrolls the cursor in the result set to a new position according to mode.
+        
+        From PEP 249:
+        If mode is relative (default),  value is taken as offset to 
+        the current position in the result set, if set to absolute, 
+        value states an absolute target position.
+    
+        An IndexError should be raised in case a  scroll  operation 
+        would  leave  the  result  set.  In  this case,  the cursor 
+        position is left undefined (ideal would be to not move  the 
+        cursor at all).
+    
+        Note:    
+        This method should use native scrollable cursors, if avail-
+        able, or revert to an emulation for forward-only scrollable 
+        cursors.  The method may raise NotSupportedError to  signal 
+        that  a specific operation is not supported by the database 
+        (e.g. backward scrolling).
+        '''
+        warning( "DB-API extension Cursor.scroll() used" )
+
+    #-------------------------------------------------------------------------
+    @abstract
+    def setinputsizes(self, sizes: Tuple[Union[int,TYPE]]) -> None:
         '''This can be used before a call to .execute*() to predefine memory areas for the operation's parameters.
     
         From PEP 249:
@@ -466,7 +613,33 @@ class Cursor:
 
 
     #-------------------------------------------------------------------------
-    def _reset_raw_descr(self) -> None:
+    def _add_message(self, exc_ref: Exception, exc_value: object) -> None:
+        '''Appends a message to the list of messages received from the DB interface.
+        
+        This is an implementation of PEP 249 DB-API Extension.
+        
+        Args:
+            exc_ref: Exception
+                A reference to the exception received from the DB interface.
+            exc_value: object
+                The value associated with the exception.
+        '''
+        warning( "DB-API extension Cursor.messages used - add message")
+        self._messages.append( (exc_ref, exc_value) )
+
+
+    #-------------------------------------------------------------------------
+    def _clear_messages(self) -> None:
+        '''Clears the list of messages received from the DB interface.
+        
+        This is an implementation of PEP 249 DB-API Extension.
+        '''
+        warning( "DB-API extension Cursor.messages used - clear messages")
+        del self._messages[:]
+
+
+    #-------------------------------------------------------------------------
+    def _reset_row_descr(self) -> None:
         '''Resets the fetched last row description.
         
         This is not part of PEP 249. It is provided as a convenience

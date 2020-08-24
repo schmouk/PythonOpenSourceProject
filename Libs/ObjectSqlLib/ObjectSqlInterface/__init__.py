@@ -32,10 +32,11 @@ from typing import Final
 
 
 #=============================================================================
-from .connect    import Connect
-from .cursor     import Cursor
-from .db_types   import *
-from .exceptions import *
+from .connection             import Connection
+from .cursor                 import Cursor
+from .db_types               import *
+from .exceptions             import *
+from .extension_messages     import ExtensionMessages
 
 
 #=============================================================================
@@ -62,3 +63,22 @@ paramstyle: Final[str] = 'format'
 #   format      ANSI C printf format codes, e.g. ...WHERE name=%s
 #   pyformat    Python extended format codes, e.g. ...WHERE name=%(name)s
 #===============================================================================
+
+
+#=============================================================================
+# for the Optional DB API Extensions
+
+import warnings
+warnings.simplefilter( 'default' )
+
+def warning(msg: str) -> None:
+    '''Sends a warning to the open console.
+    
+    Notice: mainly used for DB-API extensions (see PEP 249).
+
+    Args:
+        msg: str
+            The message to print with the warning.
+    '''
+    warnings.warn( msg )
+
