@@ -24,7 +24,7 @@ SOFTWARE.
 from typing  import Optional
 from time    import sleep
 
-from Utils.repeated_timer import RepeatedTimer
+from Utils.repeated_timer import internal_decorator, RepeatedTimer
 
 
 #=============================================================================
@@ -35,8 +35,10 @@ class MyRepeatedTimer( RepeatedTimer ):
     '''
     
     #-------------------------------------------------------------------------
-    def __init__(self, period_ms: int,
-                       name     : Optional[str] = None) -> None:
+    def __init__(self, period_ms  : int,
+                       name       : Optional[str] = None,
+                       start_count: Optional[int] = 0   ,
+                       increment  : Optional[int] = 1    ) -> None:
         '''Constructor.
         
         Args:
@@ -48,16 +50,21 @@ class MyRepeatedTimer( RepeatedTimer ):
                 The name of this watchdog.  May be None,  in
                 which  case  the  underlying  OS will give a
                 default, unique one to it. Defaults to None.
+            start_count: int
+                The starting value for counting.
+            increment: int
+                The step to increment counting.
         '''
         super().__init__( period_ms, name )
-        self._count = 0
+        self._count = start_count
+        self._incr = increment
 
     #-------------------------------------------------------------------------
     def process(self) -> None:
         '''The instructions to be run when watchdog is awaken.
         '''
-        self._count += 1
-        print( self._count, end=' ', flush=True )
+        self._count += self._incr
+        print( f"{self._count:4d}", end='', flush=True )
 
 
 #-------------------------------------------------------------------------
@@ -70,6 +77,15 @@ def test():
     repeated_timer.set_period( 0.480 )
     sleep( 3.0 )
     repeated_timer.stop()
+    print( '\n--' )
+    
+    repeated_timer = MyRepeatedTimer( 1.200, start_count=13, increment=3 )
+    repeated_timer.start()
+    sleep( 10.0 )
+    repeated_timer.set_period( 0.480 )
+    sleep( 3.0 )
+    repeated_timer.stop()
+    print( '\n' )
 
 
 #=============================================================================
