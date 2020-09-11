@@ -62,13 +62,14 @@ class RepeatedTimer( Thread ):
     processed every time the watchdog is "awaken".
     
     Users are encouraged to add attributes to  this  class.
-    Thes e will then be accessible into method '.process()'
+    These  will then be accessible into method '.process()'
     when they might be needed for this processing.
     """
     
     #-------------------------------------------------------------------------
-    def __init__(self, period_s: float,
-                       name    : Optional[str] = None) -> None:
+    def __init__(self, period_s: float               ,
+                       name    : Optional[str] = None,
+                       *args, **kwargs                ) -> None:
         '''Constructor.
         
         Args:
@@ -80,16 +81,25 @@ class RepeatedTimer( Thread ):
                 The name of this  timer.  May  be  None,  in
                 which  case  the  underlying  OS will give a
                 default, unique one to it. Defaults to None.
+            *args, **kwargs:
+                Arguments to be  passed  to  the  processing
+                function.
         '''
         self.stop_event= Event()
         
         self.set_period( period_s )
+        self.args = args
+        self.kwargs = kwargs
+        
         super().__init__( name=name )
 
     #-------------------------------------------------------------------------
     @abstract
     def process(self) -> None:
-        '''The instructions to be run when watchdog is awaken.
+        '''The instructions to be run when timer is repeated.
+        
+        'self.args'  and  'self.kwargs'  are available in 
+        this method.
         
         Raises:
             NotImplementedError: This method has not been
@@ -110,7 +120,7 @@ class RepeatedTimer( Thread ):
 
     #-------------------------------------------------------------------------
     def set_period(self, period_s: int) -> None:
-        '''Modifies/sets the period of time used fore repeating this timer.
+        '''Modifies/sets the period of time used for repeating this timer.
         
         Args:
             period_s: float
