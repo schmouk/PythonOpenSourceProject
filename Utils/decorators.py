@@ -75,8 +75,11 @@ def abstract(method: Callable) -> Callable:
             except:
                 raise NotImplementedError( f"{_msg_txt()}." )
         
+        method( *args, **kwargs )
+        
         raise NotImplementedError( f"{_msg_txt()} in class '{class_name}'." )
     #---------------------------------------------------------------------
+    
     return _wrapper
 
 #=====   end of   Utils.decorators   =====#
