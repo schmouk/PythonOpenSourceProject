@@ -1,25 +1,7 @@
-# ObjectSqlLib
+# Object SQL Interface
 
-This package contains libraries which relate to Object Oriented Programming of SQL relational databases (DB).
+This sub-package of library `ObjectSqlLib` defines the interface that every object oriented programming SQL library should conform to. 
 
-Notice: some of the listed sub-package below are not currently under development and will be implemented later.
+It is fully compliant with PEP 249 (Python Database API Specification v2.0, [https://www.python.org/dev/peps/pep-0249/](https://www.python.org/dev/peps/pep-0249/)).
 
-
-## ObjectSqlInterface
-This is a generic interface for every library that relates to SQL Databases. It conforms to PEP 249 -- Python Database API Specification v2.0. See [https://www.python.org/dev/peps/pep-0249/](https://www.python.org/dev/peps/pep-0249/).
-
-It will finally be part of further project **PySqlLib**.
-
-
-## PyPostgreSQLLib
-This package implements interface `ObjectSqlInterface`.  
-It is an OOP implementation that uses library `psycopg2` - [https://www.psycopg.org/](https://www.psycopg.org/).
-
-It will finally be part of further project **PySqlLib**.
-
-
-## PySQLiteLib
-This package implemenst interface `ObjectSqlInterface`.  
-It is an OOP implementation that uses built-in library `sqlite3`.
-
-It will finally be part of further project **PySqlLib**.
+It helps creating relational databases and serving SQL requests in an OOP manner (*Object Oriented Programming*) with Python.

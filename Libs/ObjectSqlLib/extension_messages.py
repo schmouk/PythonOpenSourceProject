@@ -27,4 +27,4 @@ ExtensionMessages = List[ Tuple[Exception, object] ]
 '''The class of lists of messages that conforms with PEP 249 DB-API Extension.
 '''
 
-#=====   end of   Libs.ObjectSqlLib.ObjectSqlInterface.extension_messages   =====#
+#=====   end of   Libs.ObjectSqlLib.extension_messages   =====#
