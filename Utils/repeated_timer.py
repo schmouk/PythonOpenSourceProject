@@ -123,7 +123,7 @@ class RepeatedTimer( Thread ):
 
     #-------------------------------------------------------------------------
     def stop(self) -> None:
-        '''Definitively stops this watchdog.
+        '''Definitively stops this repeated timer.
         '''
         self.stop_event.set()
 
